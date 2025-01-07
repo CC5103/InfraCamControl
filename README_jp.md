@@ -19,11 +19,12 @@ InfraCamControl は、Raspberry Pi を基盤としたシステムで、赤外線
 ## ハードウェア要件
 
 - **Raspberry Pi** (Model 4B)
-- **PiCamera2**
+- **PiCamera2**（OV5647 IR-CUT）
 - **赤外線 LED 発光器**（OSI5FU5111C-40 940nm）x3
 - **緑色 LED インジケータ**（OSG8HA3Z74A）
 - **赤外線受信モジュール**（OSRB38C9AA）
 - **N チャンネル MOSFET**（2SK2232）
+- **スライドスイッチ**
 - **ボタン**
 - **抵抗器**：
   - 100Ω（±5%）x4
