@@ -18,16 +18,17 @@ InfraCamControl 是一个基于 Raspberry Pi 的系统，将红外遥控功能�
 
 ## 硬件要求
 
-- **Raspberry Pi** (Model 4B)
-- **PiCamera2**
-- **红外 LED 发射器**（OSI5FU5111C-40 940nm）x3
-- **绿色 LED 指示灯**（OSG8HA3Z74A）
-- **红外接收模块**（OSRB38C9AA）
-- **N-channel MOSFET**（2SK2232）
-- **按钮**
-- **电阻器**：
-  - 100Ω（±5%）x4
-  - 10kΩ（±5%）x1
+- **Raspberry Pi**（4B 型号）  
+- **PiCamera2**（OV5647 IR-CUT）  
+- **红外线 LED 发光器**（OSI5FU5111C-40 940nm）x3  
+- **绿色 LED 指示灯**（OSG8HA3Z74A）  
+- **红外线接收模块**（OSRB38C9AA）  
+- **N 沟道 MOSFET**（2SK2232）  
+- **滑动开关**  
+- **按钮**  
+- **电阻器**：  
+  - 100Ω（±5%）x4  
+  - 10kΩ（±5%）x1  
 
 <div style="display: flex; justify-content: space-between;">
   <img src="image/breadboard.png" alt="面包板电路图" width="48%" />

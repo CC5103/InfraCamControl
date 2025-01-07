@@ -18,16 +18,17 @@ InfraCamControl is a Raspberry Pi-based system that combines infrared remote con
 
 ## Hardware Requirements
 
-- **Raspberry Pi** (Model 4B)
-- **PiCamera2**
-- **Infrared LED transmitter** (OSI5FU5111C-40 940nm) x3
-- **Green LED indicator** (OSG8HA3Z74A)
-- **Infrared receiver module** (OSRB38C9AA)
-- **N-channel MOSFET** (2SK2232)
-- **Button**
-- **Resistors**:
-  - 100Ω (±5%) x4
-  - 10kΩ (±5%) x1
+- **Raspberry Pi** (Model 4B)  
+- **PiCamera2** (OV5647 IR-CUT)  
+- **Infrared LED Emitter** (OSI5FU5111C-40 940nm) x3  
+- **Green LED Indicator** (OSG8HA3Z74A)  
+- **Infrared Receiver Module** (OSRB38C9AA)  
+- **N-Channel MOSFET** (2SK2232)  
+- **Slide Switch**  
+- **Button**  
+- **Resistors**:  
+  - 100Ω (±5%) x4  
+  - 10kΩ (±5%) x1  
 
 <div style="display: flex; justify-content: space-between;">
   <img src="image/breadboard.png" alt="Breadboard circuit diagram" width="48%" />
