@@ -21,8 +21,8 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         result = sender.fetch_slack_messages_with_retry(last_timestamp)
         if result:
             message, last_timestamp = result
-            print(f"Received message: {message}")
             if message:
+                print(f"Received message: {message}")
                 if json_changed:
                     try:
                         with open("signal_list.json") as f: # Load signal map from json file
