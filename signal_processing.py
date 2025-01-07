@@ -6,7 +6,7 @@ def signal_read(sender, save_type):
     """Read signal from IR receiver and save to csv file.
     Args:
         sender (Sender_class): Sender class instance.
-        save_type (str): Type of signal to save. "1" for NEC signal, "0" for Mitsubishi signal.
+        save_type (str): Type of signal to save. "0" for NEC signal, "1" for Mitsubishi signal.
         
     Returns:
         callback_instance (pigpio.callback): Callback instance.
