@@ -18,8 +18,9 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         json_changed (bool): Flag for checking if json file is changed.    
     """
     while True:
-        message, last_timestamp = sender.fetch_slack_messages_with_retry(last_timestamp)
-        if message:
+        result = sender.fetch_slack_messages_with_retry(last_timestamp)
+        if result:
+            message, last_timestamp = result
             print(f"Received message: {message}")
             if json_changed:
                 try:
