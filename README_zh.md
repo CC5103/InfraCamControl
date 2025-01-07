@@ -1,6 +1,6 @@
 # InfraCamControl
 
-**阅读其他语言版本：[英语](README.md)，[中文](README_zh.md)，[日本语](README_jp.md)。**
+**阅读其他语言版本：[English](README.md), [中文](README_zh.md), [日本語](README_jp.md).**
 
 ## 概述
 
