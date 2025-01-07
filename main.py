@@ -22,24 +22,25 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         if result:
             message, last_timestamp = result
             print(f"Received message: {message}")
-            if json_changed:
-                try:
-                    with open("signal_list.json") as f: # Load signal map from json file
-                        signal_map = json.load(f)
-                        json_changed = False
-                except FileNotFoundError:
-                    print("Error: config.json not found")
-                    exit(1)
+            if message:
+                if json_changed:
+                    try:
+                        with open("signal_list.json") as f: # Load signal map from json file
+                            signal_map = json.load(f)
+                            json_changed = False
+                    except FileNotFoundError:
+                        print("Error: config.json not found")
+                        exit(1)
 
-            if message in signal_map:
-                sender.send_nec_signal_wave(signal_map[message]) # Send signal to IR LED
-            elif message.startswith("crate"):
-                save_thread(sender, signal_map, *message.split()[1:]) # Save signal to json file
-                json_changed = True
-            else:
-                sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid message: {message}. \nPlase input {', '.join(list(signal_map.keys()))} \nor \ncrate <save_type> <save_key> <save_name>.")
-            sender.first = True
-            last_timestamp = None
+                if message in signal_map:
+                    sender.send_nec_signal_wave(signal_map[message]) # Send signal to IR LED
+                elif message.startswith("crate"):
+                    save_thread(sender, signal_map, *message.split()[1:]) # Save signal to json file
+                    json_changed = True
+                else:
+                    sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid message: {message}. \nPlase input {', '.join(list(signal_map.keys()))} \nor \ncrate <save_type> <save_key> <save_name>.")
+                sender.first = True
+                last_timestamp = None
         time.sleep(0.5)
 
 def camera_thread(sender):
