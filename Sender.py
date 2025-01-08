@@ -36,7 +36,7 @@ class Sender_class:
         self.pulse_list = []
         self.leader_num = 0
 
-        # Slack 配置
+        # Slack API settings
         try:
             with open("config.json") as f:
                 config = json.load(f)
@@ -48,6 +48,7 @@ class Sender_class:
 
         self.client = WebClient(token=self.SLACK_BOT_TOKEN, timeout=30)
 
+        # pigpio settings
         try:
             self.pi = pigpio.pi()
             if not self.pi.connected:
@@ -55,14 +56,28 @@ class Sender_class:
             
             self.pin_sender = pin_sender
             self.pi.set_mode(self.pin_sender, pigpio.OUTPUT)
+            
             self.pin_save = pin_save
             self.pi.set_mode(self.pin_save, pigpio.INPUT)
+            
             self.last_tick = self.pi.get_current_tick()
         except Exception as e:
             print(f"Error: {e}")
             exit(1)
             
     def fetch_slack_messages(self, last_timestamp):
+        """Fetch slack messages.
+        
+        Args:
+            last_timestamp (str): Last timestamp of fetched message.
+            
+        Returns:
+            str: Received message.
+            str: Last timestamp of fetched message.
+            
+        Raises:
+            SlackApiError: If an error occurs while fetching messages.
+        """
         try:
             response = self.client.conversations_history(channel=self.CHANNEL_ID, limit=1)
             if response["messages"]:
@@ -81,6 +96,20 @@ class Sender_class:
         return None
     
     def fetch_slack_messages_with_retry(self, last_timestamp, retries=10, delay=5):
+        """Fetch slack messages with retry.
+        
+        Args:
+            last_timestamp (str): Last timestamp of fetched message.
+            retries (int): Number of retries.
+            delay (int): Delay time between retries.
+            
+        Returns:
+            str: Received message.
+            str: Last timestamp of fetched message.
+            
+        Raises:
+            SlackApiError: If an error occurs while fetching messages.
+        """
         for attempt in range(retries):
             try:
                 return self.fetch_slack_messages(last_timestamp)
@@ -92,7 +121,15 @@ class Sender_class:
         print("All attempts to fetch Slack messages failed.")
         return None, last_timestamp
 
-    def send_nec_signal_wave(self, singal_file):
+    def send_signal_wave(self, singal_file):
+        """Send signal wave.
+        
+        Args:
+            singal_file (str): Signal file name.
+            
+        Raises:
+            FileNotFoundError: If the signal file is not found.
+        """
         pulses_base = [
             pigpio.pulse(1 << self.pin_sender, 0, 8),
             pigpio.pulse(0, 1 << self.pin_sender, 18),
@@ -128,6 +165,17 @@ class Sender_class:
             self.pi.wave_delete(wave_id)
 
     def read_csv_data(self, filename):
+        """Read data from csv file.
+        
+        Args:
+            filename (str): File name.
+            
+        Returns:
+            list: List of data.
+            
+        Raises:
+            FileNotFoundError: If the file is not found.
+        """
         try:
             with open(filename, 'r') as f:
                 data = f.read().split()
@@ -137,6 +185,24 @@ class Sender_class:
             exit(1)
             
     def pulse_callback(self, gpio, level, tick):
+        """Callback function for pulse.
+        
+        Args:
+            gpio (int): GPIO pin number.
+            level (int): GPIO level.
+            tick (int): Tick time.
+            
+        Attributes:
+            LEADER_PULSE_MIN (int): Minimum leader pulse time.
+            LEADER_PULSE_MAX (int): Maximum leader pulse time.
+            ZERO_PULSE_MIN (int): Minimum zero pulse time.
+            ZERO_PULSE_MAX (int): Maximum zero pulse time.
+            ONE_PULSE_MIN (int): Minimum one pulse time.
+            ONE_PULSE_MAX (int): Maximum one pulse time
+            
+        Raises:
+            ValueError: If the pulse is invalid.
+        """
         if self.leader_num <= 1:
             print(f"GPIO{gpio}, level: {level}, time: {tick-self.last_tick}")
             if tick - self.last_tick > self.LEADER_PULSE_MIN and tick - self.last_tick < self.LEADER_PULSE_MAX:

@@ -33,7 +33,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                         exit(1)
 
                 if message in signal_map:
-                    sender.send_nec_signal_wave(signal_map[message]) # Send signal to IR LED
+                    sender.send_signal_wave(signal_map[message]) # Send signal to IR LED
                 elif message.startswith("crate"):
                     save_thread(sender, signal_map, *message.split()[1:]) # Save signal to json file
                     json_changed = True
