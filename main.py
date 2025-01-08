@@ -41,7 +41,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                     sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid message: {message}. \nPlase input {', '.join(list(signal_map.keys()))} \nor \ncrate <save_type> <save_key> <save_name>.")
                 sender.first = True
                 last_timestamp = None
-        time.sleep(0.5)
+        time.sleep(1)
 
 def camera_thread(sender):
     """Capture video from camera and detect face.
