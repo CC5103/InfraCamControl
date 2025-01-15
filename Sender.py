@@ -56,6 +56,7 @@ class Sender_class:
             
             self.pin_sender = pin_sender
             self.pi.set_mode(self.pin_sender, pigpio.OUTPUT)
+            self.pi.write(self.pin_sender, 0)
             
             self.pin_save = pin_save
             self.pi.set_mode(self.pin_save, pigpio.INPUT)
