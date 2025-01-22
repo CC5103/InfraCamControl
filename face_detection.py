@@ -116,7 +116,7 @@ def predict(
     )
 
 
-onnx_path = "version-slim-320.onnx"
+onnx_path = "./model/version-slim-320.onnx"
 ort_session = ort.InferenceSession(onnx_path)
 input_name = ort_session.get_inputs()[0].name
 
