@@ -52,7 +52,8 @@ def camera_thread(sender):
         sender (Sender_class): Sender class instance.
     """
     picam2 = Picamera2()
-    picam2.configure(picam2.create_video_configuration())
+    video_config = picam2.create_video_configuration({"size": (640, 480)})
+    picam2.configure(video_config)
     picam2.start()
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     
