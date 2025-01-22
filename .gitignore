@@ -1,3 +1,4 @@
 config.json
 __pycache__
 test-env
+yolov8n.pt
