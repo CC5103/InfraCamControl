@@ -6,43 +6,41 @@
 
 ## Table of Contents
 
-- [InfraCamControl](#infracamcontrol)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Features](#features)
-  - [Hardware Requirements](#hardware-requirements)
-    - [PiCamera2 Module Filter Adjustment](#picamera2-module-filter-adjustment)
-  - [Software Requirements](#software-requirements)
-  - [Installation Guide](#installation-guide)
-  - [Usage Instructions](#usage-instructions)
-  - [System Architecture](#system-architecture)
-  - [Face Detection Solutions](#face-detection-solutions)
-  - [Hardware Connections](#hardware-connections)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Troubleshooting](#troubleshooting)
-  - [Acknowledgements](#acknowledgements)
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Hardware Requirements](#hardware-requirements)
+   - [PiCamera2 Module Filter Adjustment](#picamera2-module-filter-adjustment)
+4. [Software Requirements](#software-requirements)
+5. [Installation Guide](#installation-guide)
+6. [Usage Instructions](#usage-instructions)
+7. [System Architecture](#system-architecture)
+8. [Face Detection Solutions](#face-detection-solutions)
+9. [Hand Gesture Recognition](#hand-gesture-recognition)
+10. [Hardware Connections](#hardware-connections)
+11. [Contributing](#contributing)
+12. [License](#license)
+13. [Troubleshooting](#troubleshooting)
+14. [Acknowledgments](#acknowledgments)
 
 ---
 
 ## Overview
 
-InfraCamControl is an innovative Raspberry Pi-based system that combines infrared remote control functionality with computer vision technology for automated camera control. The system receives commands through Slack, controls infrared devices, automatically adjusts infrared lighting based on ambient light, and integrates with Apple devices for voice control and other smart features.
+InfraCamControl is a multifunctional smart camera control system based on Raspberry Pi, integrating infrared remote control, computer vision, and gesture recognition technology. It receives commands via Slack, supports infrared device control, face and gesture recognition, and automatically adjusts infrared illumination based on environmental light. The system also supports voice interaction with Apple devices for smarter device control.
 
 ---
 
 ## Features
 
-- **Remote Control**: Efficient remote management through Slack integration.
-- **Infrared Learning and Sending**: Supports learning and sending infrared signals.
+- **Remote Control**: Efficient remote management through Slack.
+- **Infrared Learning and Transmission**: Supports learning and sending infrared signals.
 - **Computer Vision**:
-  - OpenCV Haar Cascade
-  - YOLOv8
-  - Ultra-Light-Fast
-- **Ambient Light Management**: Automatically adjusts infrared lighting based on lighting conditions.
-- **Multitasking Support**: Multi-threaded processing to enhance performance.
+  - Supports multiple face detection solutions.
+  - Real-time hand gesture recognition.
+- **Ambient Light Management**: Automatically adjusts infrared lighting based on light conditions.
+- **Multitasking Concurrency**: Supports multithreading for better performance.
 - **Protocol Compatibility**: Supports NEC and Mitsubishi infrared signal protocols.
-- **Apple Device Integration**: Enables intelligent control via voice recognition.
+- **Apple Device Integration**: Voice recognition for smarter control.
 
 ---
 
@@ -53,12 +51,14 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
 - **Infrared LED Emitters** (OSI5FU5111C-40 940nm) ×3
 - **Green LED Indicator** (OSG8HA3Z74A)
 - **Infrared Receiver Module** (OSRB38C9AA)
-- **N-channel MOSFET** (2SK2232)
+- **N-Channel MOSFET** (2SK2232)
 - **Slide Switch**
-- **Button**
+- **Buttons**
 - **Resistors**:
   - 100Ω (±5%) ×4
   - 10kΩ (±5%) ×1
+
+### Hardware Diagram
 
 <div style="display: flex; justify-content: space-between;">
   <img src="image/breadboard.png" alt="Breadboard Circuit Diagram" width="48%" height="auto" />
@@ -67,21 +67,21 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
 <br>
 <div style="display: flex; justify-content: space-between;">
   <img src="image/Raspberry Pi Implementation Diagram.jpg" alt="Raspberry Pi Implementation Diagram" width="48%" height="auto" />
-  <img src="image/Tangent Diagram.jpg" alt="Supplementary Diagram" width="48%" height="auto" />
+  <img src="image/Tangent Diagram.jpg" alt="Tangent Diagram" width="48%" height="auto" />
 </div>
 
 ---
 
 ### PiCamera2 Module Filter Adjustment
 
-**Note**: The OV5647 IR-CUT module does not automatically switch infrared filters and must be manually removed. Follow these steps for safe disassembly:
+**Note**: The OV5647 IR-CUT module cannot automatically switch filters and requires manual removal. Below are the steps for safe disassembly:
 
-1. **Remove Screws and Connectors**  
-   Unscrew the red-marked screws and disconnect the blue-marked connectors.  
+1. **Remove Screws and Connector**  
+   Unscrew the red-marked screws and unplug the blue-marked connector.  
    <img src="image/Step1.png" alt="Step 1" width="30%" />
 
 2. **Adjust Filter and Lever**  
-   Move the blue-marked filter to the target position and slightly lift the red-marked lever, keeping it in place. Re-tighten the screws without needing to reconnect the connectors.
+   Move the blue-marked filter to the target position, gently lift the red-marked lever, and keep the lever in place. Reattach the screws without resetting the connector.
    <div style="display: flex; justify-content: space-between;">
    <img src="image/Step2.png" alt="Step 2" style="width: 58%; height: auto;" />
    <img src="image/Step3.png" alt="Step 3" style="width: 38%; height: auto;" />
@@ -92,7 +92,7 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
 ## Software Requirements
 
 - **Python 3.x**
-- Required Python Packages (install via pip):
+- Required Python packages (install via pip):
   - `picamera2`
   - `opencv-python`
   - `pigpio`
@@ -100,6 +100,7 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
   - `numpy`
   - `onnxruntime` (for Ultra-Light-Fast model)
   - `ultralytics` (for YOLOv8)
+  - `mediapipe`
 
 ---
 
@@ -120,7 +121,6 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
 
 3. **Configure Slack Integration**  
    Create a `config.json` file and add your Slack credentials:
-
    ```json
    {
      "BOT_TOKEN": "your-slack-bot-token",
@@ -141,23 +141,24 @@ InfraCamControl is an innovative Raspberry Pi-based system that combines infrare
 2. **Run the Main Program**
 
    ```bash
-   python main.py
+   python main_mediapipe.py
    ```
 
 3. **Create Infrared Signal**  
-   Input the following command in Slack to record a signal:
+   To record a signal in Slack, type the following command:
 
    ```bash
    crate <save_type> <save_key> <save_name>
    ```
 
-   - **Hardware Operation**: Set the switch to the infrared receiver and press the button to record the signal.
+   - **Hardware Action**: Switch to the infrared receiver, press the button to record the signal.
    - **Signal Protocol**: Supports NEC or Mitsubishi protocol (940nm).
    - **File Management**: The system automatically generates signal files and updates them in `signal_list.json`.
 
-4. **Send Infrared Signal**  
-   In Slack, input `<save_key>` to trigger the signal transmission.  
-   **Tip**: Press the circuit button to test hardware functionality.
+4. **Send Infrared Signal**
+
+   - **Slack Control**: Type `<save_key>` to trigger the signal.
+   - **Gesture Control**: Send the bound signal by performing the corresponding gesture (e.g., 5 fingers to activate recognition).
 
 ---
 
@@ -168,7 +169,7 @@ The system consists of two main threads:
 1. **Slack Message Thread**
 
    - Listens for commands
-   - Manages infrared signal recording and transmission
+   - Manages infrared signal recording and sending
 
 2. **Camera Thread**
    - Face detection
@@ -178,97 +179,97 @@ The system consists of two main threads:
 
 ## Face Detection Solutions
 
-The system offers three face detection implementations that can be selected based on your needs:
+The system provides the following face detection methods:
 
-### 1. OpenCV Haar Cascade (main.py)
+### 1. OpenCV Haar Cascade
 
-- Based on traditional Haar feature classifier
-- Pros:
-  - Fast execution
-  - Low resource usage
-  - No additional dependencies required
-- Cons:
-  - Lower accuracy
-  - Sensitive to lighting conditions
-- Use case: Environments with limited resources
+- Pros: Fast, low resource usage.
+- Cons: Lower accuracy, sensitive to lighting conditions.
+- Suitable for: Resource-limited environments.
 
-### 2. YOLOv8 (main_yolo.py)
+### 2. YOLOv8
 
-- Based on the latest YOLOv8 deep learning model
-- Pros:
-  - High detection accuracy
-  - Robust
-  - Supports multi-object detection
-- Cons:
-  - Higher resource usage
-  - Requires model download
-- Use case: High-precision applications
+- Pros: High detection accuracy, supports multi-object detection.
+- Cons: Higher resource usage.
+- Suitable for: High-accuracy applications.
 
-### 3. Ultra-Light-Fast (main_ultralight.py)
+### 3. Ultra-Light-Fast
 
-- Based on a lightweight neural network model
-- Pros:
-  - Fast detection
-  - Moderate resource usage
-  - Good accuracy
-- Cons:
-  - Requires model download
-  - Supports single-face detection only
-- Use case: Balancing performance and resource usage
+- Pros: Fast, moderate resource usage.
+- Cons: Single face detection only.
+- Suitable for: Balancing performance and resource demands.
+
+### 4. MediaPipe Face Mesh
+
+- Pros: High accuracy, supports multiple face detection.
+- Cons: High computational resource requirements.
+- Suitable for: Applications requiring fine feature analysis.
+
+---
+
+## Hand Gesture Recognition
+
+The system uses MediaPipe for real-time hand gesture recognition, supporting the following gestures:
+
+- **Index Finger**: Switch to "0" state.
+- **Index + Middle Finger**: Turn on the device ("on").
+- **Index + Middle + Ring Finger**: Turn off the device ("off").
+- **Open Hand**: Start the system ("start").
 
 ---
 
 ## Hardware Connections
 
-Key GPIO Interface Descriptions:
+Key GPIO Interface Description:
 
-- **GPIO25**: Infrared LED Emitter
+- **GPIO25**: Infrared LED Emitters
 - **GPIO23**: Infrared Receiver Module
-- **CSI Interface**: Camera Module Connection
-- **Status LED**: Displays system status
+- **CSI Interface**: Camera Module connection
+- **Status LED**: Displays system operational status
 
 ---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a branch
+1. Fork the repository.
+2. Create a branch.
    ```bash
    git checkout -b feature/AmazingFeature
    ```
-3. Commit changes
+3. Commit your changes.
    ```bash
    git commit -m 'Add some AmazingFeature'
    ```
-4. Push the branch
+4. Push your branch.
    ```bash
    git push origin feature/AmazingFeature
    ```
-5. Submit a Pull Request
+5. Submit a Pull Request.
 
 ---
 
 ## License
 
-This project is released under the GNU General Public License (GPL). See the `LICENSE` file for details.
+This project is licensed under the GNU General Public License (GPL). See the `LICENSE` file for more details.
 
 ---
 
 ## Troubleshooting
 
-- Ensure that the `pigpiod` service is running.
-- Check if the Slack configuration is correct.
+- Ensure the `pigpiod` service is running.
+- Check Slack configuration.
 - Verify hardware connections.
-- Confirm that the camera module is enabled.
+- Confirm the camera module is enabled.
 
 ---
 
-## Acknowledgements
+## Acknowledgments
 
-- Thanks to the **pigpio** and **OpenCV** development teams for their support.
-- Special thanks to:
-  - [yhotta240's Infrared Tutorial](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
-  - [Casareal BS Blog's Air Conditioner Remote Tutorial](https://bsblog.casareal.co.jp/archives/5010)
-  - [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
-  - [YOLOv8](https://github.com/ultralytics/ultralytics)
-  - [OpenCV](https://opencv.org/)
+- [yhotta240's infrared tutorial](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
+- [Casareal BS blog air conditioner remote tutorial](https://bsblog.casareal.co.jp/archives/5010)
+- [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
+- [YOLOv8](https://github.com/ultralytics/ultralytics)
+- [OpenCV](https://opencv.org/)
+- [Google MediaPipe](https://github.com/google/mediapipe)
+
+---
