@@ -8,7 +8,6 @@ from Sender import Sender_class
 from signal_processing import save_thread
 import cv2
 from picamera2 import Picamera2
-import numpy as np
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -72,11 +71,11 @@ def camera_thread(sender):
             break
         
         # If the screen is black, turn on the infrared light
-        average_brightness = np.mean(gray)
-        if average_brightness < 20:
-            sender.pi.write(sender.pin_sender, 1)
-        else:
-            sender.pi.write(sender.pin_sender, 0)
+        # average_brightness = np.mean(gray)
+        # if average_brightness < 20:
+        #     sender.pi.write(sender.pin_sender, 1)
+        # else:
+        #     sender.pi.write(sender.pin_sender, 0)
 
     cv2.destroyAllWindows()
 

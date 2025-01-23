@@ -1,6 +1,4 @@
-import onnxruntime as ort
 import cv2
-import numpy as np
 from picamera2 import Picamera2
 import threading
 import time
@@ -47,13 +45,12 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         time.sleep(1)
 
 def camera_thread(sender):
-    """Capture video from camera and detect face.
+    """ Camera thread for face detection using Ultralight.
     Args:
         sender (Sender_class): Sender class instance.
     """
     picam2 = Picamera2()
     
-    # 创建视频配置，分辨率为 (640, 480)
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
     picam2.start()
@@ -77,7 +74,6 @@ def camera_thread(sender):
         # else:
         #     sender.pi.write(sender.pin_sender, 0)
 
-    # 停止相机并关闭OpenCV窗口
     picam2.stop()
     cv2.destroyAllWindows()
 
