@@ -1,6 +1,5 @@
 from ultralytics import YOLO
 import cv2
-import numpy as np
 from picamera2 import Picamera2
 import threading
 import time
@@ -46,6 +45,10 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         time.sleep(1)
 
 def camera_thread(sender):
+    """ Camera thread for face detection using YOLO.  
+    Args:
+        sender (Sender_class): Sender class instance.
+    """
     picam2 = Picamera2()
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
