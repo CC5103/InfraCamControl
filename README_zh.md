@@ -6,40 +6,37 @@
 
 ## 目录
 
-- [InfraCamControl](#infracamcontrol)
-  - [目录](#目录)
-  - [概述](#概述)
-  - [特性](#特性)
-  - [硬件需求](#硬件需求)
-    - [PiCamera2 模组滤镜调整](#picamera2-模组滤镜调整)
-  - [软件需求](#软件需求)
-  - [安装指南](#安装指南)
-  - [使用说明](#使用说明)
-  - [系统架构](#系统架构)
-  - [面部检测方案](#面部检测方案)
-  - [硬件连接](#硬件连接)
-  - [贡献方式](#贡献方式)
-  - [许可证](#许可证)
-  - [故障排除](#故障排除)
-  - [致谢](#致谢)
+1. [概述](#概述)
+2. [特性](#特性)
+3. [硬件需求](#硬件需求)
+   - [PiCamera2 模组滤镜调整](#picamera2-模组滤镜调整)
+4. [软件需求](#软件需求)
+5. [安装指南](#安装指南)
+6. [使用说明](#使用说明)
+7. [系统架构](#系统架构)
+8. [面部检测方案](#面部检测方案)
+9. [手部手势识别](#手部手势识别)
+10. [硬件连接](#硬件连接)
+11. [贡献方式](#贡献方式)
+12. [许可证](#许可证)
+13. [故障排除](#故障排除)
+14. [致谢](#致谢)
 
 ---
 
 ## 概述
 
-InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控功能与计算机视觉技术结合，用于自动化相机控制。系统通过 Slack 接收指令，控制红外设备，同时根据环境光自动调整红外照明，还能与苹果设备联动，实现语音控制和其他智能化功能。
+InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系统，集成了红外遥控、计算机视觉和手势识别技术。通过 Slack 接收指令，支持红外设备控制、人脸和手势识别，并能根据环境光自动调整红外照明。同时，系统支持与苹果设备的语音联动，实现更智能的设备交互。
 
 ---
 
 ## 特性
 
-- **远程控制**：通过 Slack 集成实现高效远程管理。
-- **红外学习与发送**：支持红外信号的学习和发送。
+- **远程控制**：通过 Slack 实现高效远程管理。
+- **红外学习与发送**：支持红外信号的学习与发送。
 - **计算机视觉**：
-- **多种面部检测方案**：
-  - OpenCV Haar Cascade
-  - YOLOv8
-  - Ultra-Light-Fast
+  - 支持多种人脸检测方案。
+  - 实时手部手势识别。
 - **环境光管理**：根据光照条件自动调节红外照明。
 - **多任务并发**：支持多线程处理，提升运行效率。
 - **协议兼容性**：支持 NEC 和三菱红外信号协议。
@@ -60,6 +57,8 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
 - **电阻器**：
   - 100Ω（±5%）×4
   - 10kΩ（±5%）×1
+
+### 硬件示意图
 
 <div style="display: flex; justify-content: space-between;">
   <img src="image/breadboard.png" alt="面包板电路图" width="48%; height: auto;" />
@@ -101,6 +100,7 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
   - `numpy`
   - `onnxruntime` (用于 Ultra-Light-Fast 模型)
   - `ultralytics` (用于 YOLOv8)
+  - `mediapipe`
 
 ---
 
@@ -141,7 +141,7 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
 2. **运行主程序**
 
    ```bash
-   python main.py
+   python main_mediapipe.py
    ```
 
 3. **创建红外信号**  
@@ -155,9 +155,10 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
    - **信号协议**：支持 NEC 或三菱协议（940nm）。
    - **文件管理**：系统自动生成信号文件，并更新到 `signal_list.json`。
 
-4. **发送红外信号**  
-   在 Slack 中输入 `<save_key>` 触发信号发送。  
-   **提示**：按下电路按钮可测试硬件功能是否正常。
+4. **发送红外信号**
+
+   - **Slack 控制**：输入 `<save_key>` 触发信号发送。
+   - **手势控制**：通过手势识别发送绑定信号（5 指张开激活识别后比出对应手势）。
 
 ---
 
@@ -178,43 +179,42 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
 
 ## 面部检测方案
 
-系统提供了三种不同的面部检测实现方案，可根据需求选择：
+系统提供以下四种面部检测实现方案：
 
-### 1. OpenCV Haar Cascade (main.py)
+### 1. OpenCV Haar Cascade
 
-- 基于传统的 Haar 特征分类器
-- 优点：
-  - 运行速度快
-  - 资源占用少
-  - 无需额外依赖
-- 缺点：
-  - 准确率相对较低
-  - 对光照条件敏感
-- 适用场景：资源受限的环境
+- 优点：运行速度快，资源占用少。
+- 缺点：准确率较低，对光照条件敏感。
+- 适用场景：资源受限环境。
 
-### 2. YOLOv8 (main_yolo.py)
+### 2. YOLOv8
 
-- 基于最新的 YOLOv8 深度学习模型
-- 优点：
-  - 检测准确率高
-  - 鲁棒性强
-  - 支持多目标检测
-- 缺点：
-  - 资源占用较高
-  - 需要额外下载模型
-- 适用场景：追求高精度的应用场景
+- 优点：检测精度高，支持多目标检测。
+- 缺点：资源占用较高。
+- 适用场景：高精度应用。
 
-### 3. Ultra-Light-Fast (main_ultralight.py)
+### 3. Ultra-Light-Fast
 
-- 基于轻量级神经网络模型
-- 优点：
-  - 检测速度快
-  - 资源占用适中
-  - 准确率较好
-- 缺点：
-  - 需要额外下载模型
-  - 仅支持单人脸检测
-- 适用场景：需要平衡性能和资源的场景
+- 优点：速度快，资源占用适中。
+- 缺点：仅支持单人脸检测。
+- 适用场景：平衡性能与资源需求。
+
+### 4. MediaPipe Face Mesh
+
+- 优点：高精度，支持多人检测。
+- 缺点：对计算资源要求较高。
+- 适用场景：需要精细特征分析的应用。
+
+---
+
+## 手部手势识别
+
+系统通过 MediaPipe 实现实时手部手势识别功能，支持以下手势控制：
+
+- **食指**：切换到 "0" 状态。
+- **食指 + 中指**：打开设备（"on"）。
+- **食指 + 中指 + 无名指**：关闭设备（"off"）。
+- **全手张开**：启动系统（"start"）。
 
 ---
 
@@ -231,20 +231,20 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
 
 ## 贡献方式
 
-1. Fork 仓库
-2. 创建分支
+1. Fork 仓库。
+2. 创建分支。
    ```bash
    git checkout -b feature/AmazingFeature
    ```
-3. 提交更改
+3. 提交更改。
    ```bash
    git commit -m 'Add some AmazingFeature'
    ```
-4. 推送分支
+4. 推送分支。
    ```bash
    git push origin feature/AmazingFeature
    ```
-5. 提交 Pull Request
+5. 提交 Pull Request。
 
 ---
 
@@ -265,10 +265,9 @@ InfraCamControl 是一个基于 Raspberry Pi 的创新系统，将红外遥控�
 
 ## 致谢
 
-- 感谢 **pigpio** 和 **OpenCV** 开发团队的支持
-- 特别致谢：
-  - [yhotta240 的红外教程](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
-  - [Casareal BS 博客的空调遥控教程](https://bsblog.casareal.co.jp/archives/5010)
-  - [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
-  - [YOLOv8](https://github.com/ultralytics/ultralytics)
-  - [OpenCV](https://opencv.org/)
+- [yhotta240 的红外教程](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
+- [Casareal BS 博客的空调遥控教程](https://bsblog.casareal.co.jp/archives/5010)
+- [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
+- [YOLOv8](https://github.com/ultralytics/ultralytics)
+- [OpenCV](https://opencv.org/)
+- [Google MediaPipe](https://github.com/google/mediapipe)
