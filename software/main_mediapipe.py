@@ -6,7 +6,8 @@ import json
 from Sender import Sender_class
 from signal_processing import save_thread
 import cv2
-import face_detection
+import mediapipe as mp
+import detection
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -23,11 +24,11 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                 print(f"Received message: {message}")
                 if json_changed:
                     try:
-                        with open("signal_list.json") as f: # Load signal map from json file
+                        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
                             signal_map = json.load(f)
                             json_changed = False
                     except FileNotFoundError:
-                        print("Error: config.json not found")
+                        print("Error: signal_list.json not found")
                         exit(1)
 
                 if message in signal_map:
@@ -48,7 +49,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         time.sleep(1)
 
 def camera_thread(sender):
-    """ Camera thread for face detection using Ultralight.
+    """Capture video from camera and detect face using mediapipe. And hand gesture using mediapipe.
     Args:
         sender (Sender_class): Sender class instance.
     """
@@ -57,13 +58,43 @@ def camera_thread(sender):
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
     picam2.start()
+    
+    # Initialize MediaPipe Face Mesh
+    mp_face_mesh = mp.solutions.face_mesh
+    face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    # Initialize MediaPipe Hands
+    mp_hands = mp.solutions.hands
+    hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.3, min_tracking_confidence=0.5, max_num_hands=1)
+
+    mp_draw = mp.solutions.drawing_utils
+    draw_spec = mp_draw.DrawingSpec(thickness=1, circle_radius=1)
+    
+    try:
+        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
+            signal_map = json.load(f)
+    except FileNotFoundError:
+        print("Error: config.json not found")
+        exit(1)
+
+    # Initialize gesture recognition
+    interval = 2 # Interval for gesture recognition. (sec)
+    gesture_start_time = time.time() - interval # Initialize gesture start time
+    start_bool = False
+    
+    # Initialize detection class
+    detection_ = detection.Detection(sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map, interval)
 
     while True:
         frame = picam2.capture_array()
-        
         flipped_frame = cv2.flip(frame, 0)
+        frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
+        frame_copy = frame.copy()
 
-        frame = face_detection.detect_first_face(flipped_frame)
+        # Face detection
+        detection_.face_detection(frame)
+        
+        # Hand detection
+        gesture_start_time, start_bool, frame = detection_.hand_detection(frame_copy, frame, gesture_start_time, start_bool)
 
         cv2.imshow("Detection", frame)
 
@@ -80,7 +111,6 @@ def camera_thread(sender):
     picam2.stop()
     cv2.destroyAllWindows()
 
-
 if __name__ == '__main__':
     sender = Sender_class()
     last_timestamp = None
@@ -94,5 +124,3 @@ if __name__ == '__main__':
 
     slack_thread.join()
     camera_thread.join()
-
-

@@ -1,3 +1,4 @@
+from ultralytics import YOLO
 import cv2
 from picamera2 import Picamera2
 import threading
@@ -6,8 +7,6 @@ import json
 from Sender import Sender_class
 from signal_processing import save_thread
 import cv2
-import mediapipe as mp
-import detection
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -24,7 +23,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                 print(f"Received message: {message}")
                 if json_changed:
                     try:
-                        with open("signal_list.json") as f: # Load signal map from json file
+                        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
                             signal_map = json.load(f)
                             json_changed = False
                     except FileNotFoundError:
@@ -49,64 +48,45 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         time.sleep(1)
 
 def camera_thread(sender):
-    """Capture video from camera and detect face using mediapipe. And hand gesture using mediapipe.
+    """ Camera thread for face detection using YOLO.  
     Args:
         sender (Sender_class): Sender class instance.
     """
     picam2 = Picamera2()
-    
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
     picam2.start()
-    
-    # Initialize MediaPipe Face Mesh
-    mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
-    # Initialize MediaPipe Hands
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.3, min_tracking_confidence=0.5, max_num_hands=1)
 
-    mp_draw = mp.solutions.drawing_utils
-    draw_spec = mp_draw.DrawingSpec(thickness=1, circle_radius=1)
-    
-    try:
-        with open("signal_list.json") as f: # Load signal map from json file
-            signal_map = json.load(f)
-    except FileNotFoundError:
-        print("Error: config.json not found")
-        exit(1)
-
-    # Initialize gesture recognition
-    interval = 2 # Interval for gesture recognition. (sec)
-    gesture_start_time = time.time() - interval # Initialize gesture start time
-    start_bool = False
-    
-    # Initialize detection class
-    detection_ = detection.Detection(sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map, interval)
+    model = YOLO("yolov8n.pt")
 
     while True:
         frame = picam2.capture_array()
         flipped_frame = cv2.flip(frame, 0)
-        frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
-        frame_copy = frame.copy()
+        frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGRA2BGR)
 
-        # Face detection
-        detection_.face_detection(frame)
-        
-        # Hand detection
-        gesture_start_time, start_bool, frame = detection_.hand_detection(frame_copy, frame, gesture_start_time, start_bool)
+        results = model.predict(frame, conf=0.5, classes=0, device="cpu", verbose=False)
 
-        cv2.imshow("Detection", frame)
+        for result in results:
+            if len(result.boxes) > 0:
+                for box in result.boxes:
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])
+                    conf = box.conf[0]
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(frame, f"Face {conf:.2f}", (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+        cv2.imshow("YOLO Face Detection", frame)
+
         # If the screen is black, turn on the infrared light
-        # average_brightness = np.mean(gray)
-        # if average_brightness < 20:
+        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # if np.mean(gray) < 20:
         #     sender.pi.write(sender.pin_sender, 1)
         # else:
         #     sender.pi.write(sender.pin_sender, 0)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     picam2.stop()
     cv2.destroyAllWindows()
@@ -124,3 +104,5 @@ if __name__ == '__main__':
 
     slack_thread.join()
     camera_thread.join()
+
+
