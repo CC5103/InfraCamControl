@@ -77,11 +77,12 @@ def camera_thread(sender):
         exit(1)
 
     # Initialize gesture recognition
-    gesture_start_time = time.time() - 4 # Initialize gesture start time
+    interval = 2 # Interval for gesture recognition. (sec)
+    gesture_start_time = time.time() - interval # Initialize gesture start time
     start_bool = False
     
     # Initialize detection class
-    detection_ = detection.Detection(sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map)
+    detection_ = detection.Detection(sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map, interval)
 
     while True:
         frame = picam2.capture_array()
