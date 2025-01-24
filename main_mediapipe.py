@@ -7,7 +7,7 @@ from Sender import Sender_class
 from signal_processing import save_thread
 import cv2
 import mediapipe as mp
-import gesture
+import detection
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -58,16 +58,10 @@ def camera_thread(sender):
     
     # Initialize MediaPipe Face Mesh
     mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False,
-                                       max_num_faces=1,
-                                       min_detection_confidence=0.5,
-                                       min_tracking_confidence=0.5)
+    face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
     # Initialize MediaPipe Hands
     mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(static_image_mode=False,
-                           max_num_hands=1,
-                           min_detection_confidence=0.5,
-                           min_tracking_confidence=0.5)
+    hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.3, min_tracking_confidence=0.5, max_num_hands=1)
 
     mp_draw = mp.solutions.drawing_utils
     draw_spec = mp_draw.DrawingSpec(thickness=1, circle_radius=1)
@@ -79,45 +73,24 @@ def camera_thread(sender):
         print("Error: config.json not found")
         exit(1)
 
+    # Initialize gesture recognition
     gesture_start_time = time.time() - 4 # Initialize gesture start time
     start_bool = False
+    
+    # Initialize detection class
+    detection_ = detection.Detection(sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map)
+
     while True:
         frame = picam2.capture_array()
         flipped_frame = cv2.flip(frame, 0)
         frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
+        frame_copy = frame.copy()
 
         # Face detection
-        face_results = face_mesh.process(frame)
-        if face_results.multi_face_landmarks:
-            for face_landmarks in face_results.multi_face_landmarks:
-                mp_draw.draw_landmarks(
-                    image=frame,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_TESSELATION,
-                    landmark_drawing_spec=draw_spec,
-                    connection_drawing_spec=draw_spec)
+        detection_.face_detection(frame)
         
         # Hand detection
-        hand_results = hands.process(frame)
-        if hand_results.multi_hand_landmarks:
-            for hand_landmarks in hand_results.multi_hand_landmarks:
-                mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-                # Gesture recognition
-                gesture_message = gesture.recognize_gesture(hand_landmarks.landmark)
-                # Send signal to IR LED
-                if gesture_message:
-                    if gesture_message == "start":
-                        gesture_start_time = time.time()
-                        sender.pi.write(sender.pin_hand, 1)
-                        start_bool = True
-                    elif time.time() - gesture_start_time < 4:
-                        gesture_start_time  = gesture_start_time - 4
-                        print(f"Received gesture: {gesture_message}")
-                        sender.send_signal_wave(signal_map[gesture_message])
-        if time.time() - gesture_start_time > 4 and start_bool:
-            print("Gesture timeout")
-            sender.pi.write(sender.pin_hand, 0)
-            start_bool = False
+        gesture_start_time, start_bool, frame = detection_.hand_detectiont(frame_copy, frame, gesture_start_time, start_bool)
 
         cv2.imshow("Detection", frame)
 
