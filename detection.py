@@ -3,7 +3,7 @@ import gesture
 import threading
 
 class Detection():
-    def __init__(self, sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map):
+    def __init__(self, sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map, interval):
         """Initialize detection class.
         
         Args:
@@ -15,6 +15,7 @@ class Detection():
             mp_draw (mediapipe class): Mediapipe
             draw_spec (mediapipe class): Mediapipe
             signal_map (dict): Signal map.
+            interval (int): Interval
         """
         self.sender = sender
         self.mp_face_mesh = mp_face_mesh
@@ -24,6 +25,7 @@ class Detection():
         self.mp_draw = mp_draw
         self.draw_spec = draw_spec
         self.signal_map = signal_map
+        self.interval = interval
 
     def face_detection(self, frame):
         """Face detection using mediapipe.
@@ -57,14 +59,14 @@ class Detection():
                         gesture_start_time = time.time()
                         self.sender.pi.write(self.sender.pin_hand, 1)
                         start_bool = True
-                    elif time.time() - gesture_start_time < 4:
-                        gesture_start_time  = gesture_start_time - 4
+                    elif time.time() - gesture_start_time < self.interval:
+                        gesture_start_time  = gesture_start_time - self.interval
                         # Send signal to IR LED
                         print(f"Received gesture: {gesture_message}")
                         thread = threading.Thread(target=self.sender.send_signal_wave, args=(self.signal_map[gesture_message],))
                         thread.start()
 
-        if time.time() - gesture_start_time > 4 and start_bool:
+        if time.time() - gesture_start_time > self.interval and start_bool:
             print("Gesture timeout")
             self.sender.pi.write(self.sender.pin_hand, 0)
             start_bool = False
