@@ -1,5 +1,6 @@
 import time
 import gesture
+import threading
 
 class Detection():
     def __init__(self, sender, mp_face_mesh, face_mesh, mp_hands, hands, mp_draw, draw_spec, signal_map):
@@ -35,7 +36,7 @@ class Detection():
             for face_landmarks in face_results.multi_face_landmarks:
                 self.mp_draw.draw_landmarks(frame, face_landmarks, connections=self.mp_face_mesh.FACEMESH_TESSELATION, landmark_drawing_spec=self.draw_spec, connection_drawing_spec=self.draw_spec)
 
-    def hand_detectiont(self, frame_copy, frame, gesture_start_time, start_bool):
+    def hand_detection(self, frame_copy, frame, gesture_start_time, start_bool):
         """fast hand detection using mediapipe.
         
         Args:
@@ -60,7 +61,8 @@ class Detection():
                         gesture_start_time  = gesture_start_time - 4
                         # Send signal to IR LED
                         print(f"Received gesture: {gesture_message}")
-                        self.sender.send_signal_wave(self.signal_map[gesture_message])
+                        thread = threading.Thread(target=self.sender.send_signal_wave, args=(self.signal_map[gesture_message],))
+                        thread.start()
 
         if time.time() - gesture_start_time > 4 and start_bool:
             print("Gesture timeout")
