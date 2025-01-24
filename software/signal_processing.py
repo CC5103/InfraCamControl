@@ -35,9 +35,9 @@ def save_thread(sender, signal_map, save_type, save_key, save_name):
         time.sleep(1)
         print("Waiting for signal")
         if not sender.save_bool:
-            with open(f"{save_name}.csv", "w") as f:
+            with open(f"../IR_signal/{save_name}.csv", "w") as f:
                 f.write(" ".join(map(str, sender.pulse_list)))
-            with open("signal_list.json", "w") as f:
+            with open("../IR_signal/signal_list.json", "w") as f:
                 signal_map[save_key] = f"{save_name}.csv"
                 json.dump(signal_map, f)
             print("Signal saved")
