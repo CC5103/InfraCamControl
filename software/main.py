@@ -4,8 +4,8 @@
 import threading
 import time
 import json
-from software.Sender import Sender_class
-from software.signal_processing import save_thread
+from Sender import Sender_class
+from signal_processing import save_thread
 import cv2
 from picamera2 import Picamera2
 
@@ -24,7 +24,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                 print(f"Received message: {message}")
                 if json_changed:
                     try:
-                        with open("signal_list.json") as f: # Load signal map from json file
+                        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
                             signal_map = json.load(f)
                             json_changed = False
                     except FileNotFoundError:

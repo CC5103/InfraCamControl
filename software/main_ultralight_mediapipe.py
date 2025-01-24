@@ -3,12 +3,12 @@ from picamera2 import Picamera2
 import threading
 import time
 import json
-from software.Sender import Sender_class
-from software.signal_processing import save_thread
+from Sender import Sender_class
+from signal_processing import save_thread
 import cv2
 import face_detection
 import mediapipe as mp
-import software.gesture as gesture
+import gesture as gesture
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -25,7 +25,7 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                 print(f"Received message: {message}")
                 if json_changed:
                     try:
-                        with open("signal_list.json") as f: # Load signal map from json file
+                        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
                             signal_map = json.load(f)
                             json_changed = False
                     except FileNotFoundError:
@@ -69,7 +69,7 @@ def camera_thread(sender):
     mp_draw = mp.solutions.drawing_utils
     
     try:
-        with open("signal_list.json") as f: # Load signal map from json file
+        with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
             signal_map = json.load(f)
     except FileNotFoundError:
         print("Error: config.json not found")
