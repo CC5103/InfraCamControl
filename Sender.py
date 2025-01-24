@@ -5,7 +5,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 class Sender_class:
-    def __init__(self, pin_sender=25, pin_save=23):
+    def __init__(self, pin_sender=25, pin_save=23, pin_hand=15):
         """Initialize the Sender class.
         
         Args:
@@ -60,6 +60,10 @@ class Sender_class:
             
             self.pin_save = pin_save
             self.pi.set_mode(self.pin_save, pigpio.INPUT)
+            
+            self.pin_hand = pin_hand
+            self.pi.set_mode(self.pin_hand, pigpio.OUTPUT)
+            self.pi.write(self.pin_hand, 0)
             
             self.last_tick = self.pi.get_current_tick()
         except Exception as e:
