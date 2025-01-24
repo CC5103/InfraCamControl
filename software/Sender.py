@@ -38,7 +38,7 @@ class Sender_class:
 
         # Slack API settings
         try:
-            with open("config.json") as f:
+            with open("../config.json") as f:
                 config = json.load(f)
                 self.SLACK_BOT_TOKEN = config["BOT_TOKEN"]
                 self.CHANNEL_ID = config["ID"]
@@ -182,7 +182,7 @@ class Sender_class:
             FileNotFoundError: If the file is not found.
         """
         try:
-            with open(filename, 'r') as f:
+            with open(f'../IR_signal/{filename}', 'r') as f:
                 data = f.read().split()
                 return list(map(int, data))
         except FileNotFoundError:

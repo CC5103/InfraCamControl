@@ -1,13 +1,12 @@
-# @Author: CC5103
-# @Date: 2024/05/06
-
+import cv2
+from picamera2 import Picamera2
 import threading
 import time
 import json
-from Sender import Sender_class
-from signal_processing import save_thread
+from software.Sender import Sender_class
+from software.signal_processing import save_thread
 import cv2
-from picamera2 import Picamera2
+import face_detection
 
 def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
     """Fetch slack messages and send signal to IR LED.
@@ -49,26 +48,24 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
         time.sleep(1)
 
 def camera_thread(sender):
-    """Capture video from camera and detect face.
+    """ Camera thread for face detection using Ultralight.
     Args:
         sender (Sender_class): Sender class instance.
     """
     picam2 = Picamera2()
+    
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
     picam2.start()
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    
+
     while True:
         frame = picam2.capture_array()
+        
         flipped_frame = cv2.flip(frame, 0)
-        gray = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
-        for (x, y, w, h) in faces:
-            cv2.rectangle(flipped_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        frame = face_detection.detect_first_face(flipped_frame)
 
-        cv2.imshow("Face Detection", flipped_frame)
+        cv2.imshow("Detection", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -80,7 +77,9 @@ def camera_thread(sender):
         # else:
         #     sender.pi.write(sender.pin_sender, 0)
 
+    picam2.stop()
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     sender = Sender_class()
@@ -95,3 +94,5 @@ if __name__ == '__main__':
 
     slack_thread.join()
     camera_thread.join()
+
+
