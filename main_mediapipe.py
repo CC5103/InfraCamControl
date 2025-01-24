@@ -80,6 +80,7 @@ def camera_thread(sender):
         exit(1)
 
     gesture_start_time = time.time() - 4 # Initialize gesture start time
+    start_bool = False
     while True:
         frame = picam2.capture_array()
         flipped_frame = cv2.flip(frame, 0)
@@ -107,10 +108,16 @@ def camera_thread(sender):
                 if gesture_message:
                     if gesture_message == "start":
                         gesture_start_time = time.time()
+                        sender.pi.write(sender.pin_hand, 1)
+                        start_bool = True
                     elif time.time() - gesture_start_time < 4:
                         gesture_start_time  = gesture_start_time - 4
                         print(f"Received gesture: {gesture_message}")
                         sender.send_signal_wave(signal_map[gesture_message])
+        if time.time() - gesture_start_time > 4 and start_bool:
+            print("Gesture timeout")
+            sender.pi.write(sender.pin_hand, 0)
+            start_bool = False
 
         cv2.imshow("Detection", frame)
 
@@ -127,7 +134,6 @@ def camera_thread(sender):
     picam2.stop()
     cv2.destroyAllWindows()
 
-
 if __name__ == '__main__':
     sender = Sender_class()
     last_timestamp = None
@@ -141,5 +147,3 @@ if __name__ == '__main__':
 
     slack_thread.join()
     camera_thread.join()
-
-
