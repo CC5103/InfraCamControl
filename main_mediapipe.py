@@ -93,7 +93,7 @@ def camera_thread(sender):
         detection_.face_detection(frame)
         
         # Hand detection
-        gesture_start_time, start_bool, frame = detection_.hand_detectiont(frame_copy, frame, gesture_start_time, start_bool)
+        gesture_start_time, start_bool, frame = detection_.hand_detection(frame_copy, frame, gesture_start_time, start_bool)
 
         cv2.imshow("Detection", frame)
 
