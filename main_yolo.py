@@ -33,11 +33,14 @@ def fetch_slack_messages_thread(sender, last_timestamp, json_changed):
                 if message in signal_map:
                     sender.send_signal_wave(signal_map[message]) # Send signal to IR LED
                 elif message.startswith("crate"):
-                    if message.split()[1] in [0, 1]:
-                        save_thread(sender, signal_map, *message.split()[1:]) # Save signal to json file
-                        json_changed = True
-                    else:
-                        sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid save_type: {message.split()[1]}. \nPlase input 0(NEC) or 1(MITSUBISHI).")
+                    try:
+                        if message.split()[1] in [0, 1]:
+                            save_thread(sender, signal_map, *message.split()[1:]) # Save signal to json file
+                            json_changed = True
+                        else:
+                            sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid save_type: {message.split()[1]}. \nPlase input 0(NEC) or 1(MITSUBISHI).")
+                    except IndexError:
+                        sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid message: {message}. \nPlase input crate <save_type> <save_key> <save_name>.")
                 else:
                     sender.client.chat_postMessage(channel=sender.CHANNEL_ID, text=f"Invalid message: {message}. \nPlase input {', '.join(list(signal_map.keys()))} \nor \ncrate <save_type> <save_key> <save_name>.")
                 sender.first = True
