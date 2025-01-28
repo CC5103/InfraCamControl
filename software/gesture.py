@@ -55,7 +55,12 @@ def recognize_gesture(landmarks):
     ring_straight = is_finger_straight(landmarks, [13, 14, 15, 16])
     pinky_straight = is_finger_straight(landmarks, [17, 18, 19, 20])
 
+    Finger_up = landmarks[0].y < landmarks[17].y
+
     print(thumb_straight, index_straight, middle_straight, ring_straight, pinky_straight)
+    if Finger_up:
+        return None
+
     if not thumb_straight and not middle_straight and not ring_straight and not pinky_straight and index_straight: # 1
         return "0"
     elif not thumb_straight and not ring_straight and not pinky_straight and index_straight and middle_straight: # 2
