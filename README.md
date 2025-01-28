@@ -55,6 +55,7 @@ InfraCamControl is a multifunctional smart camera control system based on Raspbe
 - **Slide Switch**
 - **Button**
 - **Resistors**:
+  - 10Ω (±5%) ×1
   - 47Ω (±5%) ×3
   - 100Ω (±5%) ×1
   - 10kΩ (±5%) ×2
