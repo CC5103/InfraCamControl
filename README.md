@@ -26,21 +26,21 @@
 
 ## Overview
 
-InfraCamControl is a multifunctional smart camera control system based on Raspberry Pi, integrating infrared remote control, computer vision, and gesture recognition technology. It receives commands via Slack, supports infrared device control, face and gesture recognition, and automatically adjusts infrared illumination based on environmental light. The system also supports voice interaction with Apple devices for smarter device control.
+InfraCamControl is a multifunctional smart camera control system based on Raspberry Pi, integrating infrared remote control, computer vision, and gesture recognition technologies. It receives instructions via Slack, supports infrared device control, face and gesture recognition, and automatically adjusts infrared lighting based on ambient light conditions. The system also supports voice interaction with Apple devices, enabling more intelligent device interaction.
 
 ---
 
 ## Features
 
-- **Remote Control**: Efficient remote management through Slack.
-- **Infrared Learning and Transmission**: Supports learning and sending infrared signals.
+- **Remote Control**: Efficient remote management via Slack.
+- **Infrared Learning and Sending**: Supports learning and sending infrared signals.
 - **Computer Vision**:
-  - Supports multiple face detection solutions.
+  - Supports multiple face detection methods.
   - Real-time hand gesture recognition.
 - **Ambient Light Management**: Automatically adjusts infrared lighting based on light conditions.
-- **Multitasking Concurrency**: Supports multithreading for better performance.
-- **Protocol Compatibility**: Supports NEC and Mitsubishi infrared signal protocols.
-- **Apple Device Integration**: Voice recognition for smarter control.
+- **Multitasking**: Supports multithreading for improved efficiency.
+- **Protocol Compatibility**: Supports NEC and Mitsubishi infrared protocols.
+- **Apple Device Integration**: Enables smarter control via voice recognition.
 
 ---
 
@@ -48,40 +48,41 @@ InfraCamControl is a multifunctional smart camera control system based on Raspbe
 
 - **Raspberry Pi** (Model 4B)
 - **PiCamera2** (OV5647 IR-CUT)
-- **Infrared LED Emitters** (OSI5FU5111C-40 940nm) ×3
-- **Green LED Indicator** (OSG8HA3Z74A)
+- **Infrared LED Emitters** (OSI5LA5A33A-B 940nm) ×3
+- **Red LED Indicator Light** (2.3V, 25mA)
 - **Infrared Receiver Module** (OSRB38C9AA)
-- **N-Channel MOSFET** (2SK2232)
+- **N-channel MOSFETs** (2SK2232) ×2
 - **Slide Switch**
-- **Buttons**
+- **Button**
 - **Resistors**:
-  - 100Ω (±5%) ×4
+  - 47Ω (±5%) ×3
+  - 100Ω (±5%) ×1
   - 10kΩ (±5%) ×1
 
 ### Hardware Diagram
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="image/breadboard.png" alt="Breadboard Circuit Diagram" width="48%" height="auto" />
-  <img src="image/circuit_diagram.png" alt="Circuit Diagram" width="48%" height="auto" />
+  <img src="image/breadboard.png" alt="Breadboard Diagram" width="48%; height: auto;" />
+  <img src="image/circuit_diagram.png" alt="Circuit Diagram" width="48%; height: auto;" />
 </div>
 <br>
 <div style="display: flex; justify-content: space-between;">
-  <img src="image/Raspberry Pi Implementation Diagram.jpg" alt="Raspberry Pi Implementation Diagram" width="48%" height="auto" />
-  <img src="image/Tangent Diagram.jpg" alt="Tangent Diagram" width="48%" height="auto" />
+  <img src="image/Raspberry Pi Implementation Diagram.jpg" alt="Raspberry Pi Implementation" width="48% height: auto;" />
+  <img src="image/Tangent Diagram.jpg" alt="Tangent Diagram" width="48% height: auto;" />
 </div>
 
 ---
 
 ### PiCamera2 Module Filter Adjustment
 
-**Note**: The OV5647 IR-CUT module cannot automatically switch filters and requires manual removal. Below are the steps for safe disassembly:
+**Note**: The OV5647 IR-CUT module cannot automatically switch the infrared filter and needs to be manually removed. Follow these steps for non-destructive disassembly:
 
-1. **Remove Screws and Connector**  
+1. **Remove Screws and Connectors**  
    Unscrew the red-marked screws and unplug the blue-marked connector.  
    <img src="image/Step1.png" alt="Step 1" width="30%" />
 
 2. **Adjust Filter and Lever**  
-   Move the blue-marked filter to the target position, gently lift the red-marked lever, and keep the lever in place. Reattach the screws without resetting the connector.
+   Move the blue-marked filter to the target position, and gently lift the red-marked lever while keeping it in place. Reattach the screws without reconnecting the connector.
    <div style="display: flex; justify-content: space-between;">
    <img src="image/Step2.png" alt="Step 2" style="width: 58%; height: auto;" />
    <img src="image/Step3.png" alt="Step 3" style="width: 38%; height: auto;" />
@@ -92,7 +93,7 @@ InfraCamControl is a multifunctional smart camera control system based on Raspbe
 ## Software Requirements
 
 - **Python 3.x**
-- Required Python packages (install via pip):
+- Necessary Python Packages (install via pip):
   - `picamera2`
   - `opencv-python`
   - `pigpio`
@@ -141,24 +142,24 @@ InfraCamControl is a multifunctional smart camera control system based on Raspbe
 2. **Run the Main Program**
 
    ```bash
-   python main_mediapipe.py
+   python3 InfraCamControl/software/main_mediapipe.py
    ```
 
-3. **Create Infrared Signal**  
-   To record a signal in Slack, type the following command:
+3. **Create Infrared Signals**  
+   Input the following command in Slack to record a signal:
 
    ```bash
    crate <save_type> <save_key> <save_name>
    ```
 
-   - **Hardware Action**: Switch to the infrared receiver, press the button to record the signal.
-   - **Signal Protocol**: Supports NEC or Mitsubishi protocol (940nm).
+   - **Hardware Operation**: Set the switch to the infrared receiver, press the button to record the signal.
+   - **Signal Protocol**: Supports NEC or Mitsubishi protocols (940nm).
    - **File Management**: The system automatically generates signal files and updates them in `signal_list.json`.
 
-4. **Send Infrared Signal**
+4. **Send Infrared Signals**
 
-   - **Slack Control**: Type `<save_key>` to trigger the signal.
-   - **Gesture Control**: Send the bound signal by performing the corresponding gesture (e.g., 5 fingers to activate recognition).
+   - **Slack Control**: Type `<save_key>` to trigger the signal (press the button to light up the red indicator for confirmation).
+   - **Gesture Control**: Use hand gestures to send the bound signal (spread fingers to activate the system, then the red light automatically turns on as feedback. After activation, perform the corresponding gesture).
 
 ---
 
@@ -179,53 +180,54 @@ The system consists of two main threads:
 
 ## Face Detection Solutions
 
-The system provides the following face detection methods:
+The system offers the following face detection methods:
 
 ### 1. OpenCV Haar Cascade
 
-- Pros: Fast, low resource usage.
-- Cons: Lower accuracy, sensitive to lighting conditions.
-- Suitable for: Resource-limited environments.
+- **Advantages**: Fast, low resource usage.
+- **Disadvantages**: Lower accuracy, sensitive to lighting conditions.
+- **Use Case**: Resource-limited environments.
 
 ### 2. YOLOv8
 
-- Pros: High detection accuracy, supports multi-object detection.
-- Cons: Higher resource usage.
-- Suitable for: High-accuracy applications.
+- **Advantages**: High detection accuracy, supports multi-target detection.
+- **Disadvantages**: Higher resource usage.
+- **Use Case**: High-precision applications.
 
 ### 3. Ultra-Light-Fast
 
-- Pros: Fast, moderate resource usage.
-- Cons: Single face detection only.
-- Suitable for: Balancing performance and resource demands.
+- **Advantages**: Fast, moderate resource usage.
+- **Disadvantages**: Only supports single-face detection.
+- **Use Case**: Balanced performance and resource demand.
 
 ### 4. MediaPipe Face Mesh
 
-- Pros: High accuracy, supports multiple face detection.
-- Cons: High computational resource requirements.
-- Suitable for: Applications requiring fine feature analysis.
+- **Advantages**: High accuracy, supports multi-person detection.
+- **Disadvantages**: Requires significant computational resources.
+- **Use Case**: Applications needing detailed feature analysis.
 
 ---
 
 ## Hand Gesture Recognition
 
-The system uses MediaPipe for real-time hand gesture recognition, supporting the following gestures:
+The system uses MediaPipe for real-time hand gesture recognition. Supported gestures include:
 
-- **Index Finger**: Switch to "0" state.
-- **Index + Middle Finger**: Turn on the device ("on").
-- **Index + Middle + Ring Finger**: Turn off the device ("off").
-- **Open Hand**: Start the system ("start").
+- **Open Hand**: Activate the system, and the red light turns on.
+- **Index Finger**: Turn the light on/off.
+- **Index + Middle Finger**: Turn on the air conditioner.
+- **Index + Middle + Ring Finger**: Turn off the air conditioner.
 
 ---
 
 ## Hardware Connections
 
-Key GPIO Interface Description:
+Key GPIO Interface Descriptions:
 
-- **GPIO25**: Infrared LED Emitters
-- **GPIO23**: Infrared Receiver Module
-- **CSI Interface**: Camera Module connection
-- **Status LED**: Displays system operational status
+- **GPIO8**: Infrared LED Emitters
+- **GPIO24**: Infrared Receiver Module
+- **GPIO18**: Gesture Recognition Feedback (lights up the red indicator)
+- **CSI Interface**: Camera Module Connection
+- **Status LED**: Displays system status
 
 ---
 
@@ -240,7 +242,7 @@ Key GPIO Interface Description:
    ```bash
    git commit -m 'Add some AmazingFeature'
    ```
-4. Push your branch.
+4. Push the branch.
    ```bash
    git push origin feature/AmazingFeature
    ```
@@ -250,14 +252,14 @@ Key GPIO Interface Description:
 
 ## License
 
-This project is licensed under the GNU General Public License (GPL). See the `LICENSE` file for more details.
+This project is licensed under the GNU General Public License (GPL). See the `LICENSE` file for details.
 
 ---
 
 ## Troubleshooting
 
 - Ensure the `pigpiod` service is running.
-- Check Slack configuration.
+- Check if the Slack configuration is correct.
 - Verify hardware connections.
 - Confirm the camera module is enabled.
 
@@ -265,8 +267,8 @@ This project is licensed under the GNU General Public License (GPL). See the `LI
 
 ## Acknowledgments
 
-- [yhotta240's infrared tutorial](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
-- [Casareal BS blog air conditioner remote tutorial](https://bsblog.casareal.co.jp/archives/5010)
+- [yhotta240's Infrared Tutorial](https://qiita.com/yhotta240/items/df0f2f92b5dff1d9410b)
+- [Casareal BS Blog's Air Conditioner Remote Control Tutorial](https://bsblog.casareal.co.jp/archives/5010)
 - [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
 - [YOLOv8](https://github.com/ultralytics/ultralytics)
 - [OpenCV](https://opencv.org/)
