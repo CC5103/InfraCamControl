@@ -48,14 +48,15 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 
 - **Raspberry Pi** (Model 4B)
 - **PiCamera2**（OV5647 IR-CUT）
-- **红外 LED 发光器**（OSI5FU5111C-40 940nm）×3
-- **绿色 LED 指示灯**（OSG8HA3Z74A）
+- **红外 LED 发光器**（OSI5LA5A33A-B 940nm）×3
+- **红色 LED 指示灯**（2.3V, 25mA）
 - **红外接收模块**（OSRB38C9AA）
-- **N 沟道 MOSFET**（2SK2232）
+- **N 沟道 MOSFET**（2SK2232）×2
 - **滑动开关**
 - **按钮**
 - **电阻器**：
-  - 100Ω（±5%）×4
+  - 47Ω (±5%) ×3
+  - 100Ω（±5%）×1
   - 10kΩ（±5%）×1
 
 ### 硬件示意图
@@ -66,8 +67,8 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 </div>
 <br>
 <div style="display: flex; justify-content: space-between;">
-  <img src="image/Raspberry Pi Implementation Diagram.jpg" alt="Raspberry Pi 実装図" width="48% height: auto;" />
-  <img src="image/Tangent Diagram.jpg" alt="補助図" width="48% height: auto;" />
+  <img src="image/Raspberry Pi Implementation Diagram.jpg" alt="Raspberry Pi 实现图" width="48%" height="auto;" />
+  <img src="image/Tangent Diagram.jpg" alt="辅助图" width="48%" height="auto;" />
 </div>
 
 ---
@@ -83,8 +84,8 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 2. **调整滤镜和拨杆**  
    将蓝色标记的滤镜移至目标位置，并轻微翘起红色标记的拨杆，保持拨杆位置不变。重新固定螺丝，无需复位插头。
    <div style="display: flex; justify-content: space-between;">
-   <img src="image/Step2.png" alt="步骤2" style="width: 58%; height: auto;" />
-   <img src="image/Step3.png" alt="步骤3" style="width: 38%; height: auto;" />
+     <img src="image/Step2.png" alt="步骤2" style="width: 58%; height: auto;" />
+     <img src="image/Step3.png" alt="步骤3" style="width: 38%; height: auto;" />
    </div>
 
 ---
@@ -141,7 +142,7 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 2. **运行主程序**
 
    ```bash
-   python main_mediapipe.py
+   python3 InfraCamControl/software/main_mediapipe.py
    ```
 
 3. **创建红外信号**  
@@ -157,8 +158,8 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 
 4. **发送红外信号**
 
-   - **Slack 控制**：输入 `<save_key>` 触发信号发送。
-   - **手势控制**：通过手势识别发送绑定信号（5 指张开激活识别后比出对应手势）。
+   - **Slack 控制**：输入 `<save_key>` 触发信号发送（按下按钮点亮红灯可以确认系统是否正常）。
+   - **手势控制**：通过手势识别发送绑定信号（5 指张开激活系统此时红灯自动点亮作为反馈，激活后比出对应手势）。
 
 ---
 
@@ -211,10 +212,10 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 
 系统通过 MediaPipe 实现实时手部手势识别功能，支持以下手势控制：
 
-- **食指**：切换到 "0" 状态。
-- **食指 + 中指**：打开设备（"on"）。
-- **食指 + 中指 + 无名指**：关闭设备（"off"）。
-- **全手张开**：启动系统（"start"）。
+- **全手张开**：启动系统，此时红灯点亮。
+- **食指**：开/关灯。
+- **食指 + 中指**：开空调。
+- **食指 + 中指 + 无名指**：关空调。
 
 ---
 
@@ -222,8 +223,9 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 
 关键 GPIO 接口说明：
 
-- **GPIO25**：红外 LED 发射器
-- **GPIO23**：红外接收模块
+- **GPIO8**：红外 LED 发射器
+- **GPIO24**：红外接收模块
+- **GPIO18**：手势识别反馈（点亮红灯）
 - **CSI 接口**：摄像头模块连接
 - **状态 LED**：显示系统运行状态
 
@@ -271,3 +273,5 @@ InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系�
 - [YOLOv8](https://github.com/ultralytics/ultralytics)
 - [OpenCV](https://opencv.org/)
 - [Google MediaPipe](https://github.com/google/mediapipe)
+
+---
