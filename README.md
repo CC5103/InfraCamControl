@@ -6,21 +6,28 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Hardware Requirements](#hardware-requirements)
-   - [PiCamera2 Module Filter Adjustment](#picamera2-module-filter-adjustment)
-4. [Software Requirements](#software-requirements)
-5. [Installation Guide](#installation-guide)
-6. [Usage Instructions](#usage-instructions)
-7. [System Architecture](#system-architecture)
-8. [Face Detection Solutions](#face-detection-solutions)
-9. [Hand Gesture Recognition](#hand-gesture-recognition)
-10. [Hardware Connections](#hardware-connections)
-11. [Contributing](#contributing)
-12. [License](#license)
-13. [Troubleshooting](#troubleshooting)
-14. [Acknowledgments](#acknowledgments)
+- [InfraCamControl](#infracamcontrol)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Features](#features)
+  - [Hardware Requirements](#hardware-requirements)
+    - [Hardware Diagram](#hardware-diagram)
+    - [PiCamera2 Module Filter Adjustment](#picamera2-module-filter-adjustment)
+  - [Software Requirements](#software-requirements)
+  - [Installation Guide](#installation-guide)
+  - [Usage Instructions](#usage-instructions)
+  - [System Architecture](#system-architecture)
+  - [Face Detection Solutions](#face-detection-solutions)
+    - [1. OpenCV Haar Cascade](#1-opencv-haar-cascade)
+    - [2. YOLOv8](#2-yolov8)
+    - [3. Ultra-Light-Fast](#3-ultra-light-fast)
+    - [4. MediaPipe Face Mesh](#4-mediapipe-face-mesh)
+  - [Hand Gesture Recognition](#hand-gesture-recognition)
+  - [Hardware Connections](#hardware-connections)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Troubleshooting](#troubleshooting)
+  - [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -48,8 +55,9 @@ InfraCamControl is a multifunctional smart camera control system based on Raspbe
 
 - **Raspberry Pi** (Model 4B)
 - **PiCamera2** (OV5647 IR-CUT)
-- **Infrared LED Emitters** (OSI5LA5A33A-B 940nm) ×3
+- **Infrared LED Emitters** (OSI5LA5A33A-B 940nm) ×9
 - **Red LED Indicator Light** (2.3V, 25mA)
+- **Diode** (1N5819)
 - **Infrared Receiver Module** (OSRB38C9AA)
 - **N-channel MOSFETs** (2SK2232) ×2
 - **Slide Switch**
