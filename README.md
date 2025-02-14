@@ -35,6 +35,8 @@
 
 InfraCamControl is a multifunctional smart camera control system based on Raspberry Pi, integrating infrared remote control, computer vision, and gesture recognition technologies. It receives instructions via Slack, supports infrared device control, face and gesture recognition, and automatically adjusts infrared lighting based on ambient light conditions. The system also supports voice interaction with Apple devices, enabling more intelligent device interaction.
 
+<img src = "image/System_Diagram.png" alt="System Diagram"></img>
+
 ---
 
 ## Features
