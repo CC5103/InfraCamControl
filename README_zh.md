@@ -35,6 +35,8 @@
 
 InfraCamControl 是一个基于 Raspberry Pi 的多功能智能相机控制系统，集成了红外遥控、计算机视觉和手势识别技术。通过 Slack 接收指令，支持红外设备控制、人脸和手势识别，并能根据环境光自动调整红外照明。同时，系统支持与苹果设备的语音联动，实现更智能的设备交互。
 
+<img src = "image/System_Diagram.png" alt="System Diagram"></img>
+
 ---
 
 ## 特性
