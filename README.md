@@ -233,8 +233,8 @@ The system uses MediaPipe for real-time hand gesture recognition. Supported gest
 Key GPIO Interface Descriptions:
 
 - **GPIO8**: Infrared LED Emitters
-- **GPIO24**: Infrared Receiver Module
-- **GPIO18**: Gesture Recognition Feedback (lights up the red indicator)
+- **GPIO25**: Infrared Receiver Module
+- **GPIO23**: Gesture Recognition Feedback (lights up the red indicator)
 - **CSI Interface**: Camera Module Connection
 - **Status LED**: Displays system status
 
