@@ -57,6 +57,10 @@ def camera_thread(sender):
     
     video_config = picam2.create_video_configuration({"size": (640, 480)})
     picam2.configure(video_config)
+    
+    picam2.set_controls({"AwbEnable": 0})  # Turn off AWB (Because there is no infrared filter the color correction is incorrect which affects the recognition accuracy)
+    # picam2.set_controls({"ColourGains": (0.3, 2)})  # Set the color gain to correct the color
+
     picam2.start()
     
     # Initialize MediaPipe Face Mesh
@@ -100,7 +104,7 @@ def camera_thread(sender):
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        
+
         # If the screen is black, turn on the infrared light
         # average_brightness = np.mean(gray)
         # if average_brightness < 20:
