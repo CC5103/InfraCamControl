@@ -5,7 +5,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 class Sender_class:
-    def __init__(self, pin_sender=8, pin_save=24, pin_hand=18):
+    def __init__(self, pin_sender=8, pin_save=25, pin_hand=23):
         """Initialize the Sender class.
         
         Args:
