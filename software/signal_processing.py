@@ -12,9 +12,12 @@ def signal_read(sender, save_type):
         callback_instance (pigpio.callback): Callback instance.
     """
     if save_type == "0":
-        sender.LEADER_PULSE_MIN, sender.LEADER_PULSE_MAX = 8500, 9500
-        sender.ZERO_PULSE_MIN, sender.ZERO_PULSE_MAX = 500, 700
-        sender.ONE_PULSE_MIN, sender.ONE_PULSE_MAX = 1500, 1800
+        # sender.LEADER_PULSE_MIN, sender.LEADER_PULSE_MAX = 8500, 9500
+        # sender.ZERO_PULSE_MIN, sender.ZERO_PULSE_MAX = 500, 700
+        # sender.ONE_PULSE_MIN, sender.ONE_PULSE_MAX = 1500, 1800
+        sender.LEADER_PULSE_MIN, sender.LEADER_PULSE_MAX = 3000, 4000
+        sender.ZERO_PULSE_MIN, sender.ZERO_PULSE_MAX = 350, 600
+        sender.ONE_PULSE_MIN, sender.ONE_PULSE_MAX = 1100, 1500
     elif save_type == "1":
         sender.LEADER_PULSE_MIN, sender.LEADER_PULSE_MAX = 3000, 3500
         sender.ZERO_PULSE_MIN, sender.ZERO_PULSE_MAX = 300, 700

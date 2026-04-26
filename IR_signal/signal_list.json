@@ -1,1 +1,1 @@
-{"0": "light.csv", "on": "ac_start.csv", "off": "ac_stop.csv"}
+{"0": "light_on.csv", "on": "ac_start.csv", "off": "ac_stop.csv", "1": "light_off.csv", "cool": "cool.csv"}

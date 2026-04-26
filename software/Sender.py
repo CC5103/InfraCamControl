@@ -144,12 +144,27 @@ class Sender_class:
         
         data_bits = self.read_csv_data(singal_file)
         if len(data_bits) < 50:
-            pulses.extend(pulses_base * int(9000 // 26))
-            pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 4500))
+            # pulses.extend(pulses_base * int(9000 // 26))
+            # pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 4500))
+            # for bit in data_bits:
+            #     pulses.extend(pulses_base * int(560 // 26))
+            #     pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 1690) if bit == 1 else pigpio.pulse(0, 1 << self.pin_sender, 560))
+            # pulses.extend(pulses_base * int(560 // 26))
+            # pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 0))
+            # Leader（缩放版）
+            pulses.extend(pulses_base * int(3500 // 26))
+            pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 1750))
+
+            # 数据位
             for bit in data_bits:
-                pulses.extend(pulses_base * int(560 // 26))
-                pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 1690) if bit == 1 else pigpio.pulse(0, 1 << self.pin_sender, 560))
-            pulses.extend(pulses_base * int(560 // 26))
+                pulses.extend(pulses_base * int(430 // 26))
+                if bit == 1:
+                    pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 1300))
+                else:
+                    pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 430))
+
+            # 结束位
+            pulses.extend(pulses_base * int(430 // 26))
             pulses.append(pigpio.pulse(0, 1 << self.pin_sender, 0))
         else:
             pulses.extend(pulses_base * int(3190 // 26))

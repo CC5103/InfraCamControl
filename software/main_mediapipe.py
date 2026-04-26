@@ -77,7 +77,7 @@ def camera_thread(sender):
         with open("../IR_signal/signal_list.json") as f: # Load signal map from json file
             signal_map = json.load(f)
     except FileNotFoundError:
-        print("Error: config.json not found")
+        print("Error: signal_list.json not found")
         exit(1)
 
     # Initialize gesture recognition
@@ -90,8 +90,8 @@ def camera_thread(sender):
 
     while True:
         frame = picam2.capture_array()
-        flipped_frame = cv2.flip(frame, 0)
-        frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
+        # flipped_frame = cv2.flip(frame, 0)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_copy = frame.copy()
 
         # Face detection
@@ -100,10 +100,10 @@ def camera_thread(sender):
         # Hand detection
         gesture_start_time, start_bool, frame = detection_.hand_detection(frame_copy, frame, gesture_start_time, start_bool)
 
-        cv2.imshow("Detection", frame)
+        # cv2.imshow("Detection", frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
         # If the screen is black, turn on the infrared light
         # average_brightness = np.mean(gray)
