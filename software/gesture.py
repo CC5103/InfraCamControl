@@ -64,9 +64,13 @@ def recognize_gesture(landmarks):
     if not thumb_straight and not middle_straight and not ring_straight and not pinky_straight and index_straight: # 1
         return "0"
     elif not thumb_straight and not ring_straight and not pinky_straight and index_straight and middle_straight: # 2
-        return "on"
+        return "1"
     elif  not thumb_straight and not pinky_straight and index_straight and middle_straight and ring_straight: # 3
+        return "on"
+    elif not thumb_straight and index_straight and middle_straight and ring_straight and pinky_straight: # 4
         return "off"
+    elif thumb_straight and not index_straight and not middle_straight and not ring_straight and pinky_straight: # 6
+        return "cool"
     elif thumb_straight and index_straight and middle_straight and ring_straight and pinky_straight: # 5
         return "start"
     else:
